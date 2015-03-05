@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import javafx.scene.layout.RowConstraints;
+
 import javax.xml.bind.DatatypeConverter;
 
 import org.joda.time.Days;
@@ -41,11 +43,13 @@ public class Main {
 	public static void main(String[] args) throws InvalidRangeException, IOException{
 //		String filename = "/home/roger/ICOS/L3_from_LSCE/CO2_EUROPE_LSCE.nc";
 
-		NetcdfFile ncfile = null;
+		//NetcdfFile ncfile = null;
 	    
 	    //Test NetCDF files
-	    createNetCDF("/disk/ICOS/NetCDF_test/create/newNetCDF.nc", readCSV("/disk/ICOS/InGOS/PAL-155-CH4-ingos_0.csv"));
-	    getSlice();
+		writeNetCDFSinglePass("/disk/ICOS/InGOS/PAL-155-CH4-ingos_0.csv", "/disk/ICOS/NetCDF_test/create/newNetCDFsinglePass.nc");
+		
+	    //createNetCDF("/disk/ICOS/NetCDF_test/create/newNetCDF.nc", readCSV("/disk/ICOS/InGOS/PAL-155-CH4-ingos_0.csv"));
+	    //getSlice();
 	    //findSubset();
 //	    dumpNetCdfTestFiles();
 //	    aggregate();
@@ -80,6 +84,106 @@ public class Main {
 	        ch4 = _ch4;
 	        stDev = _stdDev;
 	    }
+	}
+	
+	private static void writeNetCDFSinglePass(String csvFile, String netCdfFile){
+		long start = System.currentTimeMillis();
+		
+		BufferedReader br = null;
+		String line = "";
+		String cvsSplitBy = ";";
+		Calendar startDateTime = DatatypeConverter.parseDateTime("2010-01-01T00:00:00Z");
+		LocalDateTime startDate = new LocalDateTime(startDateTime.getTimeInMillis());
+		List<dataStruct> fileData = new ArrayList<dataStruct>();
+		int rowCounter = 0;
+
+		try {
+			NetcdfFileWriter writer = NetcdfFileWriter.createNew(NetcdfFileWriter.Version.netcdf3, netCdfFile, null);
+			
+			// add dimensions
+			//Dimension tstep = writer.addDimension(null, "tstep", 7660);
+			Dimension tstep = writer.addUnlimitedDimension("tstep");
+			List<Dimension> dims = new ArrayList<Dimension>();
+		    dims.add(tstep);
+			
+			// add Variable int timestp(tstep)
+		    Variable timeV = writer.addVariable(null, "timestp", DataType.INT, dims);
+		    timeV.addAttribute(new Attribute("title", "time steps"));
+		    timeV.addAttribute(new Attribute("units", "hours since 2010-01-01 00:00:00"));
+		    timeV.addAttribute(new Attribute("long_name", "time steps (hours) since 2010-01-01 00:00:00 (UTC)"));
+		    
+		    // add Variable float ch4(tstep)
+		    Variable ch4V = writer.addVariable(null, "ch4", DataType.FLOAT, dims);
+		    ch4V.addAttribute(new Attribute("title", "CH4"));
+		    ch4V.addAttribute(new Attribute("units", "Squirrels per bucket"));
+		    ch4V.addAttribute(new Attribute("long_name", "CH4 concentration meassured in squirrels/bucket"));
+		    
+		    // add Variable float Stdev(tstep)
+		    Variable stdDevV = writer.addVariable(null, "Stdev", DataType.FLOAT, dims);
+		    stdDevV.addAttribute(new Attribute("title", "Stdev"));
+		    stdDevV.addAttribute(new Attribute("units", "None"));
+		    stdDevV.addAttribute(new Attribute("long_name", "Standard deviation"));
+		    
+		    // add global attributes
+		    writer.addGroupAttribute(null, new Attribute("yo", "face"));
+		    writer.addGroupAttribute(null, new Attribute("versionD", 1.2));
+		    writer.addGroupAttribute(null, new Attribute("versionF", (float) 1.2));
+		    writer.addGroupAttribute(null, new Attribute("versionI", 1));
+		    writer.addGroupAttribute(null, new Attribute("versionS", (short) 2));
+		    writer.addGroupAttribute(null, new Attribute("versionB", (byte) 3));
+
+		    // create the file
+		    writer.create();
+		    
+			br = new BufferedReader(new FileReader(csvFile));
+			//Read past the header	
+			line = br.readLine();
+
+			while ((line = br.readLine()) != null) {
+				String[] record = line.split(cvsSplitBy);
+				String dateTimeStr = record[1] + "-" + record[2] + "-" + record[3] + "T" + record[4] + ":" + record[5] + ":" + record[6] + "Z";
+				//System.out.println(dateTimeStr);
+				Calendar cal = DatatypeConverter.parseDateTime(dateTimeStr);
+				//System.out.println(cal.getTime().toString());
+				ArrayInt timeA = new ArrayInt.D1(1);
+				timeA.setInt(0, Hours.hoursBetween(startDate, new LocalDateTime(cal.getTimeInMillis())).getHours());
+				writer.write(timeV, new int[]{rowCounter}, timeA);
+				
+			    ArrayFloat ch4A = new ArrayFloat.D1(1);
+			    ch4A.setFloat(0, Float.parseFloat(record[10]));
+			    writer.write(ch4V, new int[]{rowCounter}, ch4A);
+			    
+			    ArrayFloat stdDevA = new ArrayFloat.D1(1);
+			    stdDevA.setFloat(0, Float.parseFloat(record[11]));
+			    writer.write(stdDevV, new int[]{rowCounter}, stdDevA);
+			    
+			    rowCounter++;
+			}
+			
+			writer.close();
+	 
+		} catch (InvalidRangeException e) {
+			System.out.println(e);
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			System.out.println(e);
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.out.println(e);
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		long now = System.currentTimeMillis();
+	    System.out.println("Created NetCDF file in " + (now - start) + " ms");
+	    System.out.println("Number of rows read: " + rowCounter);
 	}
 	
 	private static List<dataStruct> readCSV(String fileName){
@@ -153,8 +257,8 @@ public class Main {
 			// add Variable int timestp(tstep)
 		    Variable timeV = writer.addVariable(null, "timestp", DataType.INT, dims);
 		    timeV.addAttribute(new Attribute("title", "time steps"));
-		    timeV.addAttribute(new Attribute("units", "time steps (hours) since 2010-01-01T00:00:00Z"));
-		    timeV.addAttribute(new Attribute("long_name", "time steps (hours) since 2010-01-01T00:00:00Z"));
+		    timeV.addAttribute(new Attribute("units", "hours since 2010-01-01 00:00:00"));
+		    timeV.addAttribute(new Attribute("long_name", "time steps (hours) since 2010-01-01 00:00:00 (UTC)"));
 		    
 		    // add Variable float ch4(tstep)
 		    Variable ch4V = writer.addVariable(null, "ch4", DataType.FLOAT, dims);
