@@ -3,10 +3,20 @@ package se.lu.nateko.icosnetcdf
 import ucar.nc2.Variable
 import ucar.ma2.{Array => CdmArray, DataType}
 import scala.util.Try
+import scala.util.Success
+import scala.util.Failure
 
 sealed trait PlainColumn{
 	type V
 	def values: Iterator[V]
+
+	def asFloat: Try[FloatColumn] = as[FloatColumn]
+	def asInt: Try[IntColumn] = as[IntColumn]
+
+	private[this] def as[T <: PlainColumn](implicit mf: Manifest[T]): Try[T] = this match{
+		case f: T => Success(f)
+		case _ => Failure(new Error("The plain column was not of expected type " + mf.toString))
+	}
 }
 
 trait IntColumn extends PlainColumn{ type V = Int }
