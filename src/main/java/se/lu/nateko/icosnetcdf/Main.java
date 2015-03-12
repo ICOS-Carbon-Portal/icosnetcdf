@@ -27,6 +27,7 @@ import ucar.ma2.Index;
 import ucar.ma2.InvalidRangeException;
 import ucar.ma2.Section;
 import ucar.nc2.*;
+import ucar.nc2.dataset.CoordinateAxis1DTime;
 import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dt.grid.GeoGrid;
 import ucar.nc2.dt.grid.GridDataset;
@@ -39,12 +40,12 @@ import ucar.ma2.MAMath;
 public class Main {
 	
 	public static void main(String[] args) throws InvalidRangeException, IOException{
-//		String filename = "/home/roger/ICOS/L3_from_LSCE/CO2_EUROPE_LSCE.nc";
+		String filename = "/home/roger/ICOS/L3_from_LSCE/CO2_EUROPE_LSCE.nc";
 
-		//NetcdfFile ncfile = null;
+		NetcdfFile ncfile = null;
 	    
 	    //Test NetCDF files
-		writeNetCDFSinglePass("/disk/ICOS/InGOS/PAL-155-CH4-ingos_0.csv", "/disk/ICOS/NetCDF_test/create/newNetCDFsinglePass.nc");
+		//writeNetCDFSinglePass("/disk/ICOS/InGOS/PAL-155-CH4-ingos_0.csv", "/disk/ICOS/NetCDF_test/create/newNetCDFsinglePass.nc");
 		
 	    //createNetCDF("/disk/ICOS/NetCDF_test/create/newNetCDF.nc", readCSV("/disk/ICOS/InGOS/PAL-155-CH4-ingos_0.csv"));
 	    //getSlice();
@@ -52,24 +53,25 @@ public class Main {
 //	    dumpNetCdfTestFiles();
 //	    aggregate();
 		
-//		try {
-//		    ncfile = NetcdfFile.open(filename);
+		try {
+		    ncfile = NetcdfFile.open(filename);
 		    
 //		    ncdump(ncfile);
 //		    detailedInfo(ncfile);
 //		    extractPsurfValues(ncfile);
 //		    extractCO2Values(ncfile);
+		    //extractCO2Values(ncfile, "", "");
 //		    extractPsurfByTimeAndPos(ncfile);
 //		    statistics();
-//		} catch (IOException ioe) {
-//
-//		} finally { 
-//			if (null != ncfile) try {
-//		      ncfile.close();
-//		    } catch (IOException ioe) {
-//
-//		    }
-//		}
+		} catch (IOException ioe) {
+
+		} finally { 
+			if (null != ncfile) try {
+		      ncfile.close();
+		    } catch (IOException ioe) {
+
+		    }
+		}
 	}
 	
 	private static class dataStruct{
@@ -92,11 +94,11 @@ public class Main {
 		String cvsSplitBy = ";";
 		Calendar startDateTime = DatatypeConverter.parseDateTime("2010-01-01T00:00:00Z");
 		LocalDateTime startDate = new LocalDateTime(startDateTime.getTimeInMillis());
-		List<dataStruct> fileData = new ArrayList<dataStruct>();
 		int rowCounter = 0;
+		NetcdfFileWriter writer = null;
 
 		try {
-			NetcdfFileWriter writer = NetcdfFileWriter.createNew(NetcdfFileWriter.Version.netcdf3, netCdfFile, null);
+			writer = NetcdfFileWriter.createNew(NetcdfFileWriter.Version.netcdf3, netCdfFile, null);
 			
 			// add dimensions
 			//Dimension tstep = writer.addDimension(null, "tstep", 7660);
@@ -136,6 +138,9 @@ public class Main {
 			br = new BufferedReader(new FileReader(csvFile));
 			//Read past the header	
 			line = br.readLine();
+			
+			ArrayInt intA = new ArrayInt.D1(1);
+			ArrayFloat floatA = new ArrayFloat.D1(1);
 
 			while ((line = br.readLine()) != null) {
 				String[] record = line.split(cvsSplitBy);
@@ -143,23 +148,18 @@ public class Main {
 				//System.out.println(dateTimeStr);
 				Calendar cal = DatatypeConverter.parseDateTime(dateTimeStr);
 				//System.out.println(cal.getTime().toString());
-				ArrayInt timeA = new ArrayInt.D1(1);
-				timeA.setInt(0, Hours.hoursBetween(startDate, new LocalDateTime(cal.getTimeInMillis())).getHours());
-				writer.write(timeV, new int[]{rowCounter}, timeA);
 				
-			    ArrayFloat ch4A = new ArrayFloat.D1(1);
-			    ch4A.setFloat(0, Float.parseFloat(record[10]));
-			    writer.write(ch4V, new int[]{rowCounter}, ch4A);
+				intA.setInt(0, Hours.hoursBetween(startDate, new LocalDateTime(cal.getTimeInMillis())).getHours());
+				writer.write(timeV, new int[]{rowCounter}, intA);
 			    
-			    ArrayFloat stdDevA = new ArrayFloat.D1(1);
-			    stdDevA.setFloat(0, Float.parseFloat(record[11]));
-			    writer.write(stdDevV, new int[]{rowCounter}, stdDevA);
+				floatA.setFloat(0, Float.parseFloat(record[10]));
+			    writer.write(ch4V, new int[]{rowCounter}, floatA);
+			    
+			    floatA.setFloat(0, Float.parseFloat(record[11]));
+			    writer.write(stdDevV, new int[]{rowCounter}, floatA);
 			    
 			    rowCounter++;
 			}
-			
-			writer.close();
-	 
 		} catch (InvalidRangeException e) {
 			System.out.println(e);
 			e.printStackTrace();
@@ -174,6 +174,14 @@ public class Main {
 				try {
 					br.close();
 				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (writer != null){
+				try {
+					writer.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -331,6 +339,7 @@ public class Main {
 			ncfile = NetcdfDataset.open("/home/roger/ICOS/LWdown_daily_WFDEI/Tair_daily_WFDEI_joined.nc" );
 			//ncfile = NetcdfDataset.open("/disk/Tair_daily_WFDEI_joined.nc" );
 			Variable v = ncfile.findVariable(varName);
+			
 			
 			long start = System.currentTimeMillis();
 			
