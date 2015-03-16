@@ -7,7 +7,7 @@ public class NetCdfVariableInfo {
 	public final String name;
 	public final DataType dataType;
 	public final String attrTitle, attrUnits, attrLongName;
-	
+
 	public NetCdfVariableInfo(String name, DataType dataType, String attrTitle, String attrUnits, String attrLongName){
 		this.name = name;
 		this.dataType = dataType;
