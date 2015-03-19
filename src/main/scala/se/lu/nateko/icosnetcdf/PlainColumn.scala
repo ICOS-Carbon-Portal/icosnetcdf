@@ -5,14 +5,22 @@ import ucar.ma2.{Array => CdmArray, DataType}
 import scala.util.Try
 import scala.util.Success
 import scala.util.Failure
+import java.nio._
 
 sealed trait PlainColumn{
 	type V
 	def values: Iterator[V]
 
-	def asFloat: Try[FloatColumn] = as[FloatColumn]
 	def asInt: Try[IntColumn] = as[IntColumn]
+	def asLong: Try[LongColumn] = as[LongColumn]
+	def asFloat: Try[FloatColumn] = as[FloatColumn]
+	def asDouble: Try[DoubleColumn] = as[DoubleColumn]
 	def asString: Try[StringColumn] = as[StringColumn]
+
+	def asShort: Try[ShortColumn] = as[ShortColumn]
+	def asChar: Try[CharColumn] = as[CharColumn]
+	def asBoolean: Try[BooleanColumn] = as[BooleanColumn]
+	def asByte: Try[ByteColumn] = as[ByteColumn]
 
 	private[this] def as[T <: PlainColumn](implicit mf: Manifest[T]): Try[T] = this match{
 		case f: T => Success(f)
@@ -21,8 +29,15 @@ sealed trait PlainColumn{
 }
 
 trait IntColumn extends PlainColumn{ type V = Int }
+trait LongColumn extends PlainColumn{ type V = Long }
 trait FloatColumn extends PlainColumn{ type V = Float }
+trait DoubleColumn extends PlainColumn{ type V = Double }
 trait StringColumn extends PlainColumn{ type V = String }
+
+trait ShortColumn extends PlainColumn{ type V = Short }
+trait CharColumn extends PlainColumn{ type V = Char }
+trait BooleanColumn extends PlainColumn{ type V = Boolean }
+trait ByteColumn extends PlainColumn{ type V = Byte }
 
 object PlainColumn{
 
@@ -46,6 +61,23 @@ object PlainColumn{
 			case dt @ _ => throw new Exception("Unsupported NetCDF variable data type: " + dt.name)
 		}
 
+	}
+
+
+	def apply(buffer: Buffer): Try[PlainColumn] = Try{
+		val len = buffer.limit - buffer.position
+
+		buffer match {
+			case intBuffer : IntBuffer => new IntColumn{ def values = Iterator.fill(len)(intBuffer.get) }
+			case longBuffer : LongBuffer => new LongColumn{ def values = Iterator.fill(len)(longBuffer.get) }
+			case floatBuffer : FloatBuffer => new FloatColumn{ def values = Iterator.fill(len)(floatBuffer.get) }
+			case doubleBuffer : DoubleBuffer => new DoubleColumn{ def values = Iterator.fill(len)(doubleBuffer.get) }
+			case charBuffer : CharBuffer => new CharColumn{ def values = Iterator.fill(len)(charBuffer.get) }
+			case shortBuffer : ShortBuffer => new ShortColumn{ def values = Iterator.fill(len)(shortBuffer.get) }
+			case byteBuffer : ByteBuffer => new ByteColumn{ def values = Iterator.fill(len)(byteBuffer.get) }
+
+			case _ => throw new Exception("Unsupported buffer type " + buffer.getClass.getCanonicalName)
+		}
 	}
 
 }
