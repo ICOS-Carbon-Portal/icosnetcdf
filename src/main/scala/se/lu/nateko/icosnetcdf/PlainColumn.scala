@@ -65,16 +65,20 @@ object PlainColumn{
 
 
 	def apply(buffer: Buffer): Try[PlainColumn] = Try{
-		val len = buffer.limit - buffer.position
+
+		def iter[T](getter: => T): Iterator[T] = {
+			buffer.rewind()
+			Iterator.fill(buffer.limit)(getter)
+		}
 
 		buffer match {
-			case intBuffer : IntBuffer => new IntColumn{ def values = Iterator.fill(len)(intBuffer.get) }
-			case longBuffer : LongBuffer => new LongColumn{ def values = Iterator.fill(len)(longBuffer.get) }
-			case floatBuffer : FloatBuffer => new FloatColumn{ def values = Iterator.fill(len)(floatBuffer.get) }
-			case doubleBuffer : DoubleBuffer => new DoubleColumn{ def values = Iterator.fill(len)(doubleBuffer.get) }
-			case charBuffer : CharBuffer => new CharColumn{ def values = Iterator.fill(len)(charBuffer.get) }
-			case shortBuffer : ShortBuffer => new ShortColumn{ def values = Iterator.fill(len)(shortBuffer.get) }
-			case byteBuffer : ByteBuffer => new ByteColumn{ def values = Iterator.fill(len)(byteBuffer.get) }
+			case intBuffer : IntBuffer => new IntColumn{ def values = iter(intBuffer.get) }
+			case longBuffer : LongBuffer => new LongColumn{ def values = iter(longBuffer.get) }
+			case floatBuffer : FloatBuffer => new FloatColumn{ def values = iter(floatBuffer.get) }
+			case doubleBuffer : DoubleBuffer => new DoubleColumn{ def values = iter(doubleBuffer.get) }
+			case charBuffer : CharBuffer => new CharColumn{ def values = iter(charBuffer.get) }
+			case shortBuffer : ShortBuffer => new ShortColumn{ def values = iter(shortBuffer.get) }
+			case byteBuffer : ByteBuffer => new ByteColumn{ def values = iter(byteBuffer.get) }
 
 			case _ => throw new Exception("Unsupported buffer type " + buffer.getClass.getCanonicalName)
 		}

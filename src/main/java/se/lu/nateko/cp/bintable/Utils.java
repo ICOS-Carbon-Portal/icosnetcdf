@@ -33,6 +33,10 @@ public class Utils {
 			case LONG: return 8;
 			case FLOAT: return 4;
 			case DOUBLE: return 8;
+			case SHORT: return 2;
+			case CHAR: return 1;
+			case BYTE: return 1;
+			case STRING: return 4;
 			default: throw unsupportedDatatypeException(dt);
 		}
 	}

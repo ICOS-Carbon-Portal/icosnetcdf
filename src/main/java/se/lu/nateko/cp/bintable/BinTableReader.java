@@ -26,7 +26,15 @@ public class BinTableReader extends BinTableFile {
 		long byteOffset = columnOffsets[column] + offset * valueSize;
 		int byteSize = valueSize * size;
 
-		ByteBuffer bytes = file.getChannel().map(MapMode.READ_ONLY, byteOffset, byteSize);
+		ByteBuffer bytes;
+
+		if(byteSize < 10000){
+			file.seek(byteOffset);
+			byte[] barray = new byte[byteSize];
+			file.read(barray);
+			bytes = ByteBuffer.wrap(barray);
+		}else
+			bytes = file.getChannel().map(MapMode.READ_ONLY, byteOffset, byteSize);
 
 		switch(dt){
 			case INT: return bytes.asIntBuffer();

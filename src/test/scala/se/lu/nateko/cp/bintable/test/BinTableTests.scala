@@ -25,13 +25,13 @@ class BinTableTest extends FunSuite{
 
 		val reader = new BinTableReader(file, schema)
 
-		val first = PlainColumn(reader.read(0)).flatMap(_.asInt).get.values
-		val second = PlainColumn(reader.read(1)).flatMap(_.asLong).get.values
+		val first = PlainColumn(reader.read(0, 0, 1000)).flatMap(_.asInt).get.values
+		val second = PlainColumn(reader.read(1, 0, 1000)).flatMap(_.asLong).get.values
 
 		val size = first.zip(second).size
 		reader.close()
 
-		assert(size === n)
+		assert(size === 1000)
 	}
 
 }
