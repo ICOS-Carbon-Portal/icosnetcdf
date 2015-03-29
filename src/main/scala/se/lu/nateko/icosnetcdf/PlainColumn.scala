@@ -7,7 +7,7 @@ import scala.util.Success
 import scala.util.Failure
 import java.nio._
 
-sealed trait PlainColumn{
+sealed trait PlainColumn{ self =>
 	type V
 	def values: Iterator[V]
 
@@ -26,6 +26,8 @@ sealed trait PlainColumn{
 		case f: T => Success(f)
 		case _ => Failure(new Error("The plain column was not of expected type " + mf.toString))
 	}
+
+	def map(f: V => String): StringColumn = new StringColumn { def values = self.values.map(f) }
 }
 
 trait IntColumn extends PlainColumn{ type V = Int }
