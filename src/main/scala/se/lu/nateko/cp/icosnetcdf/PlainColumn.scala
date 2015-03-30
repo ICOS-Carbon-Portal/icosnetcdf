@@ -1,4 +1,4 @@
-package se.lu.nateko.icosnetcdf
+package se.lu.nateko.cp.icosnetcdf
 
 import ucar.nc2.Variable
 import ucar.ma2.{Array => CdmArray, DataType}
@@ -60,6 +60,25 @@ object PlainColumn{
 			case DataType.INT => new IntColumn{ def values = getValues(_.getInt) }
 			case DataType.FLOAT => new FloatColumn{ def values = getValues(_.getFloat) }
 			case DataType.STRING => new StringColumn{ def values = getValues(arr => ind => arr.getObject(ind).asInstanceOf[String]) }
+			case dt @ _ => throw new Exception("Unsupported NetCDF variable data type: " + dt.name)
+		}
+
+	}
+	
+	def apply(array: CdmArray): Try[PlainColumn] = Try{
+
+		assert(array.getRank == 1, "Expecting NetCDF variable rank to be 1 to convert to a plain column")
+
+		val n = array.getShape.apply(0)
+
+		def getValues[T](accessor: Int => T): Iterator[T] = {
+			Range(0, n).iterator.map(accessor)
+		}
+
+		array.getDataType match{
+			case DataType.INT => new IntColumn{ def values = getValues(array.getInt) }
+			case DataType.FLOAT => new FloatColumn{ def values = getValues(array.getFloat) }
+			case DataType.STRING => new StringColumn{ def values = getValues(ind => array.getObject(ind).asInstanceOf[String]) }
 			case dt @ _ => throw new Exception("Unsupported NetCDF variable data type: " + dt.name)
 		}
 

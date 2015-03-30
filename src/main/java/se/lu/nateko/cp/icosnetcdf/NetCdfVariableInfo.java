@@ -1,4 +1,4 @@
-package se.lu.nateko.icosnetcdf;
+package se.lu.nateko.cp.icosnetcdf;
 
 import ucar.ma2.DataType;
 

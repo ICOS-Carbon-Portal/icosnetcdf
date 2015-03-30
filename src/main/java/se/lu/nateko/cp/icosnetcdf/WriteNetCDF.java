@@ -1,4 +1,4 @@
-package se.lu.nateko.icosnetcdf;
+package se.lu.nateko.cp.icosnetcdf;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import scala.NotImplementedError;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayDouble;
 import ucar.ma2.ArrayFloat;
@@ -17,6 +18,7 @@ import ucar.ma2.InvalidRangeException;
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
 import ucar.nc2.NetcdfFileWriter;
+import ucar.nc2.NetcdfFileWriter.Version;
 import ucar.nc2.Variable;
 
 
@@ -26,10 +28,25 @@ public class WriteNetCDF implements NetCdfWriter{
 	private NetcdfFileWriter writer = null;
 	private int rowCounter = 0;
 	
-	public WriteNetCDF(NetCdfSchema schema, File file) throws IOException {
+	public enum ncVersion{
+		NC3(NetcdfFileWriter.Version.netcdf3),
+		NC4(NetcdfFileWriter.Version.netcdf4);
+		
+		ncVersion(NetcdfFileWriter.Version version) {
+	        this.version = version;
+	    }
+		
+	    final NetcdfFileWriter.Version version;
+	}
+	
+	public WriteNetCDF(NetCdfSchema schema, File file, ncVersion ver) throws IOException {
 		this.schema = schema;
 		
-		writer = NetcdfFileWriter.createNew(NetcdfFileWriter.Version.netcdf3, file.getAbsolutePath(), null);
+		if ((file.getName().endsWith(".nc4") && ver == ncVersion.NC3) || (file.getName().endsWith(".nc") && ver == ncVersion.NC4)){
+			throw new IllegalArgumentException("File extension (" + file.getName() + ") does not match NetCDF version (" + ver.version.toString() + ")");
+		}
+		
+		writer = NetcdfFileWriter.createNew(ver.version, file.getAbsolutePath(), null);
 		
 		// add dimensions
 		Dimension tstep;
@@ -67,6 +84,10 @@ public class WriteNetCDF implements NetCdfWriter{
 	    }
 	    
 	    writer.create();
+	}
+	
+	public WriteNetCDF(NetCdfSchema schema, File file) throws IOException {
+		this(schema, file, ncVersion.NC4);
 	}
 
 	@Override

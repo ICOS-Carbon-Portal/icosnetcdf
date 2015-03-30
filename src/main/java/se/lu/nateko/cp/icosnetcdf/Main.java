@@ -1,4 +1,4 @@
-package se.lu.nateko.icosnetcdf;
+package se.lu.nateko.cp.icosnetcdf;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.bind.DatatypeConverter;
@@ -18,10 +19,13 @@ import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.Period;
 
+import se.lu.nateko.cp.csv.CsvSchema;
+import se.lu.nateko.cp.csv.ReadCSV;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayDouble;
 import ucar.ma2.ArrayFloat;
 import ucar.ma2.ArrayInt;
+import ucar.ma2.ArrayInt.D1;
 import ucar.ma2.DataType;
 import ucar.ma2.Index;
 import ucar.ma2.InvalidRangeException;
@@ -40,9 +44,51 @@ import ucar.ma2.MAMath;
 public class Main {
 	
 	public static void main(String[] args) throws InvalidRangeException, IOException{
-		String filename = "/home/roger/ICOS/L3_from_LSCE/CO2_EUROPE_LSCE.nc";
+		
+		File file = new File("/disk/ICOS/InGOS/PAL-180-CH4-ingos_0.csv");
+		char separator = ';';
+		
+		String header[] = {"Site", "Year", "Month", "Day", "Hour", "Minute", "Second", "DecimalDate", "Scale", "Version", "ch4", "Stdev", "NbPoints", "NbTotalPoints", "OriginalFlag", "UserFlag", "Questionable", "InstId", "SamplingHeight", "SubmissionDate", "WorkingStandardRepeatability", "LabInternalScaleConsistency", "MonthlyReproducibility", "ScaleTransferNonLinearityUncertainty", "SmoothedFlaskComparisonUncertainty", "IndividualContinuousFlaskDifference", "IndividualContinuousFlaskDifferenceUncertainty"};
+		int[] dateTimeInd = {1, 2, 3, 4, 5, 6};
+		int[] colData = {10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24, 25, 26};
+		
+		CsvSchema schema = new CsvSchema(header, dateTimeInd, colData);
+		int rowCount = 0;
+		
+		try {
+			ReadCSV csv = new ReadCSV(file, separator, schema);
+			Iterator<String[]> it = csv.getIterator();
+			
+			while (it.hasNext()) {
 
-		NetcdfFile ncfile = null;
+				String[] row = it.next();
+				String data = "";
+				
+				for (int i=0; i<schema.colData.length; i++){
+					data += csv.getColName(schema.colData[i]) + ": " + row[schema.colData[i]] + " ";
+				}
+				
+				rowCount++;
+				
+			    System.out.println(csv.getDateTime(row).getTime().toString() + ": " + data);
+			    
+			}
+			
+			csv.close();
+			
+			System.out.println("Rows: " + rowCount);
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//String filename = "/home/roger/ICOS/L3_from_LSCE/CO2_EUROPE_LSCE.nc";
+		//String filename = "/disk/ICOS/NetCDF_test/create/largeTestDataLIMITED.nc4";
+
+		//NetcdfFile ncfile = null;
+		
+		//createNetCDF4();
 	    
 	    //Test NetCDF files
 		//writeNetCDFSinglePass("/disk/ICOS/InGOS/PAL-155-CH4-ingos_0.csv", "/disk/ICOS/NetCDF_test/create/newNetCDFsinglePass.nc");
@@ -53,25 +99,78 @@ public class Main {
 //	    dumpNetCdfTestFiles();
 //	    aggregate();
 		
+//		try {
+//		    //ncfile = NetcdfFile.open(filename);
+//		    
+////		    ncdump(ncfile);
+////		    detailedInfo(ncfile);
+//		    //extractValuesFrom4(ncfile);
+////		    extractCO2Values(ncfile);
+//		    //extractCO2Values(ncfile, "", "");
+////		    extractPsurfByTimeAndPos(ncfile);
+////		    statistics();
+//		} catch (IOException ioe) {
+//
+//		} finally { 
+//			if (null != ncfile) try {
+//		      ncfile.close();
+//		    } catch (IOException ioe) {
+//
+//		    }
+//		}
+	}
+	
+	private static void createNetCDF4(){
+		String filename = "/disk/ICOS/NetCDF_test/create/firstTest.nc4";
+		NetcdfFileWriter writer = null;
+		int limit = 5;
+		
 		try {
-		    ncfile = NetcdfFile.open(filename);
+			writer = NetcdfFileWriter.createNew(NetcdfFileWriter.Version.netcdf4, filename, null);
+			Dimension dim = writer.addDimension(null, "dim", limit);
+			List<Dimension> dims = new ArrayList<Dimension>();
+		    dims.add(dim);
 		    
-//		    ncdump(ncfile);
-//		    detailedInfo(ncfile);
-//		    extractPsurfValues(ncfile);
-//		    extractCO2Values(ncfile);
-		    //extractCO2Values(ncfile, "", "");
-//		    extractPsurfByTimeAndPos(ncfile);
-//		    statistics();
-		} catch (IOException ioe) {
-
-		} finally { 
-			if (null != ncfile) try {
-		      ncfile.close();
-		    } catch (IOException ioe) {
-
+		    Variable var1 = writer.addVariable(null, "var1", DataType.INT, dims);
+		    Variable var2 = writer.addVariable(null, "var2", DataType.INT, dims);
+		    
+		    ArrayInt arr1 = new ArrayInt.D1(limit);
+		    ArrayInt arr2 = new ArrayInt.D1(limit);
+		    
+		    for (int i=0; i<limit; i++){
+		    	arr1.setInt(i, 11);
+		    	arr2.setInt(i, 22);
 		    }
+		    
+		    System.out.println(dim);
+		    
+		    writer.write(var1, arr1);
+		    writer.write(var2, arr2);
+		    
+			writer.create();
+			
+		} catch (InvalidRangeException e){
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
+		
+//		NetcdfFile ncfile = null;
+//		
+//		try {
+//		    ncfile = NetcdfFile.open(filename);
+//
+//		} catch (IOException ioe) {
+//
+//		} finally { 
+//			if (null != ncfile) try {
+//		      ncfile.close();
+//		    } catch (IOException ioe) {
+//
+//		    }
+//		}
 	}
 	
 	private static class dataStruct{
@@ -508,14 +607,14 @@ public class Main {
 		}
 	}
 	
-	private static void extractPsurfValues(NetcdfFile ncfile){
-		String varName = "psurf";
-		String outFile = "/home/roger/ICOS/L3_from_LSCE/psurf.txt";
+	private static void extractValuesFrom4(NetcdfFile ncfile){
+		String varName = "var2";
+		String outFile = "/disk/ICOS/NetCDF_test/create/largeTestDataLIMITED.nc4.txt";
 		
 		try {
 			long start = System.currentTimeMillis();
 			Variable v = ncfile.findVariable(varName);
-			Array data = v.read("118:120, 68:70, 98:100");
+			Array data = v.read("123456:1234567");
 			
 			long now = System.currentTimeMillis();
 		    System.out.println("Execute time for extractPsurfValues: " + (now - start) + " ms");

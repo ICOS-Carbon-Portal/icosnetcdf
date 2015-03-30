@@ -1,4 +1,4 @@
-package se.lu.nateko
+package se.lu.nateko.cp
 
 package object icosnetcdf{
 

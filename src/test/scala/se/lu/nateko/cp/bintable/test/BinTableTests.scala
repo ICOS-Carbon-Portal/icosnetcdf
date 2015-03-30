@@ -4,7 +4,7 @@ import org.scalatest.FunSuite
 import se.lu.nateko.cp.bintable._
 import java.io.File
 import se.lu.nateko.cp.test.TestUtils
-import se.lu.nateko.icosnetcdf.PlainColumn
+import se.lu.nateko.cp.icosnetcdf.PlainColumn
 import scala.util.Success
 
 class BinTableTest extends FunSuite{
@@ -19,7 +19,7 @@ class BinTableTest extends FunSuite{
 		val writer = new BinTableWriter(file, schema)
 
 		for(i <- 1 to n){
-			writer.write(i, i.toLong << 16)
+			writer.write((i, i.toLong << 16))
 		}
 
 		writer.close()
