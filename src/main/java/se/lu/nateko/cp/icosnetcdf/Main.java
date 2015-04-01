@@ -19,8 +19,6 @@ import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.Period;
 
-import se.lu.nateko.cp.csv.CsvSchema;
-import se.lu.nateko.cp.csv.ReadCSV;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayDouble;
 import ucar.ma2.ArrayFloat;
@@ -45,38 +43,8 @@ public class Main {
 	
 	public static void main(String[] args) throws InvalidRangeException, IOException{
 		
-		File file = new File("/disk/ICOS/InGOS/PAL-180-CH4-ingos_0.csv");
-		char separator = ';';
-		
-		String header[] = {"Site", "Year", "Month", "Day", "Hour", "Minute", "Second", "DecimalDate", "Scale", "Version", "ch4", "Stdev", "NbPoints", "NbTotalPoints", "OriginalFlag", "UserFlag", "Questionable", "InstId", "SamplingHeight", "SubmissionDate", "WorkingStandardRepeatability", "LabInternalScaleConsistency", "MonthlyReproducibility", "ScaleTransferNonLinearityUncertainty", "SmoothedFlaskComparisonUncertainty", "IndividualContinuousFlaskDifference", "IndividualContinuousFlaskDifferenceUncertainty"};
-		int[] dateTimeInd = {1, 2, 3, 4, 5, 6};
-		int[] colData = {10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24, 25, 26};
-		
-		CsvSchema schema = new CsvSchema(header, dateTimeInd, colData);
-		int rowCount = 0;
 		
 		try {
-			ReadCSV csv = new ReadCSV(file, separator, schema);
-			Iterator<String[]> it = csv.getIterator();
-			
-			while (it.hasNext()) {
-
-				String[] row = it.next();
-				String data = "";
-				
-				for (int i=0; i<schema.colData.length; i++){
-					data += csv.getColName(schema.colData[i]) + ": " + row[schema.colData[i]] + " ";
-				}
-				
-				rowCount++;
-				
-			    System.out.println(csv.getDateTime(row).getTime().toString() + ": " + data);
-			    
-			}
-			
-			csv.close();
-			
-			System.out.println("Rows: " + rowCount);
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
