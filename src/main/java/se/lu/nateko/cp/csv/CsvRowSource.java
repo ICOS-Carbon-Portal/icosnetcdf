@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
 import se.lu.nateko.cp.bintable.DataType;
+
 import com.opencsv.CSVReader;
 
 public class CsvRowSource implements RowSource{
@@ -70,24 +72,36 @@ public class CsvRowSource implements RowSource{
 	public ColumnDefinition[] getSchema() {
 		return schema;
 	}
-	
+
 	public static Object parse(String value, DataType dtype){
-		//TODO Investigate locales
+		// TODO Investigate locales
+		// TODO Investigate what happens when col count mismatch on different rows 
 		switch(dtype){
 			case INT: return Integer.parseInt(value);
 			case STRING: return value;
 			case FLOAT: 
-				Float tmp = Float.parseFloat(value);
-				if (tmp.isInfinite()){
-					throw new NumberFormatException(value + " exceeds the boundary of Float");
+				Float flt = Float.parseFloat(value);
+				if (flt.isInfinite()){
+					throw new NumberFormatException(value + " exceeds the boundary of Float.");
 				} else {
 					return Float.parseFloat(value);
 				}
-			case DOUBLE: return Double.parseDouble(value);
+			case DOUBLE: 
+				Double dbl = Double.parseDouble(value);
+				if(dbl.isInfinite()){
+					throw new NumberFormatException(value + " exceeds the boundary of Double.");
+				} else {
+					return Double.parseDouble(value);
+				}
 			case LONG: return Long.parseLong(value);
 			case BYTE: return Byte.parseByte(value);
 			case SHORT: return Short.parseShort(value);
-			case CHAR: return value.charAt(0);
+			case CHAR: 
+				if (value.length() == 1){
+					return value.charAt(0);
+				} else {
+					throw new IllegalArgumentException(value + " is too long. Only one character is allowed.");
+				}
 			default: throw new RuntimeException("Unsupported datatype " + dtype); 
 		}
 		

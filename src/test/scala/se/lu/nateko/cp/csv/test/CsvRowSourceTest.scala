@@ -82,6 +82,30 @@ class CsvRowSourceTest extends FunSpec{
 			}
 		}
 		
+		it("should produce a NumberFormatException for type FLOAT when exceeding max value"){
+			val content = header + "\n" + """3.4028236E38"""
+			
+			val colDefs = Array(
+				new ColumnDefinition("header", DataType.FLOAT)
+			)
+			
+			intercept[NumberFormatException] {
+				implicit val rows = makeRows(content, colDefs)				
+			}
+		}
+		
+		it("should produce a NumberFormatException for type DOUBLE when exceeding max value"){
+			val content = header + "\n" + """2.7976931348623157E308"""
+			
+			val colDefs = Array(
+				new ColumnDefinition("header", DataType.DOUBLE)
+			)
+			
+			intercept[NumberFormatException] {
+				implicit val rows = makeRows(content, colDefs)				
+			}
+		}
+		
 		it("should produce a NumberFormatException for type LONG when exceeding max value"){
 			val content = header + "\n" + """9223372036854775808"""
 			
@@ -94,14 +118,50 @@ class CsvRowSourceTest extends FunSpec{
 			}
 		}
 		
-		it("should produce a NumberFormatException for type FLOAT when exceeding max value"){
-			val content = header + "\n" + """3.4028236E38"""
+		it("should produce a NumberFormatException for type BYTE when illegal value is provided"){
+			val content = header + "\n" + """d"""
 			
 			val colDefs = Array(
-				new ColumnDefinition("header", DataType.FLOAT)
+				new ColumnDefinition("header", DataType.BYTE)
 			)
 			
 			intercept[NumberFormatException] {
+				implicit val rows = makeRows(content, colDefs)				
+			}
+		}
+		
+		it("should produce a NumberFormatException for type SHORT when exceeding max value"){
+			val content = header + "\n" + """32768"""
+			
+			val colDefs = Array(
+				new ColumnDefinition("header", DataType.SHORT)
+			)
+			
+			intercept[NumberFormatException] {
+				implicit val rows = makeRows(content, colDefs)				
+			}
+		}
+		
+		it("should produce a IllegalArgumentException for type CHAR when exceeding one character"){
+			val content = header + "\n" + """vv"""
+			
+			val colDefs = Array(
+				new ColumnDefinition("header", DataType.CHAR)
+			)
+			
+			intercept[IllegalArgumentException] {
+				implicit val rows = makeRows(content, colDefs)				
+			}
+		}
+		
+		it("should produce a NoSuchElementException when header mismatch"){
+			val content = header + "\n" + """1"""
+			
+			val colDefs = Array(
+				new ColumnDefinition("wrong_header", DataType.INT)
+			)
+			
+			intercept[NoSuchElementException] {
 				implicit val rows = makeRows(content, colDefs)				
 			}
 		}
