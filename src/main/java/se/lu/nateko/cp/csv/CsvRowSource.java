@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import se.lu.nateko.cp.bintable.DataType;
+import se.lu.nateko.cp.rowsource.ColumnDefinition;
+import se.lu.nateko.cp.rowsource.RowSource;
 
 import com.opencsv.CSVReader;
 
@@ -23,20 +25,20 @@ public class CsvRowSource implements RowSource{
 		this.schema = schema;
 		this.reader = new CSVReader(reader, separator);
 		String[] header = this.reader.readNext();
-    	
-    	n = schema.length;
-    	dtypes = new DataType[n];
-    	positions = new int[n];
-    	
-    	for(int i = 0; i < n; i++){
-    		String col = schema[i].name;
-    		positions[i] = indexIn(header, col);
-    		dtypes[i] = schema[i].dtype;
-    	}
-    	
-    	innerIter = this.reader.iterator();
+
+		n = schema.length;
+		dtypes = new DataType[n];
+		positions = new int[n];
+
+		for(int i = 0; i < n; i++){
+			String col = schema[i].name;
+			positions[i] = indexIn(header, col);
+			dtypes[i] = schema[i].dtype;
+		}
+
+		innerIter = this.reader.iterator();
 	}
-	
+
 	@Override
 	public boolean hasNext() {
 		if(closed) return false;
@@ -55,10 +57,10 @@ public class CsvRowSource implements RowSource{
 		Object[] row = new Object[n];
 		String[] raw = innerIter.next();
 		
-    	for(int i = 0; i < n; i++){
-    		row[i] = parse(raw[positions[i]], dtypes[i]);
-    	}
-    	return row;
+		for(int i = 0; i < n; i++){
+			row[i] = parse(raw[positions[i]], dtypes[i]);
+		}
+		return row;
 	}
 
 	@Override
@@ -81,32 +83,31 @@ public class CsvRowSource implements RowSource{
 			case STRING: return value;
 			case FLOAT: 
 				Float flt = Float.parseFloat(value);
-				if (flt.isInfinite()){
-					throw new NumberFormatException(value + " exceeds the boundary of Float.");
-				} else {
-					return Float.parseFloat(value);
-				}
+				if (flt.isInfinite())
+					throw new NumberFormatException(value + " is outside the range for Float.");
+				else
+					return flt;
 			case DOUBLE: 
 				Double dbl = Double.parseDouble(value);
-				if(dbl.isInfinite()){
-					throw new NumberFormatException(value + " exceeds the boundary of Double.");
-				} else {
-					return Double.parseDouble(value);
-				}
+				if(dbl.isInfinite())
+					throw new NumberFormatException(value + " is outside the range for Double.");
+				else
+					return dbl;
 			case LONG: return Long.parseLong(value);
 			case BYTE: return Byte.parseByte(value);
 			case SHORT: return Short.parseShort(value);
 			case CHAR: 
-				if (value.length() == 1){
+				if (value.length() == 1)
 					return value.charAt(0);
-				} else {
+				else if(value.length() == 0)
+					return Character.MIN_VALUE;
+				else
 					throw new IllegalArgumentException(value + " is too long. Only one character is allowed.");
-				}
+
 			default: throw new RuntimeException("Unsupported datatype " + dtype); 
 		}
-		
 	}
-	
+
 	private static int indexIn(String[] headerColumns, String columnName){
 		for(int i = 0; i < headerColumns.length; i++){
 			if(columnName.equals(headerColumns[i])) return i;

@@ -1,4 +1,4 @@
-package se.lu.nateko.cp.csv;
+package se.lu.nateko.cp.rowsource;
 
 import se.lu.nateko.cp.bintable.DataType;
 

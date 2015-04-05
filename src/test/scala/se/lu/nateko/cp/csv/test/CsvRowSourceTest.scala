@@ -2,10 +2,10 @@ package se.lu.nateko.cp.csv.test
 
 import org.scalatest.FunSpec
 import java.io.StringReader
-import se.lu.nateko.cp.csv.CsvRowSource
-import se.lu.nateko.cp.csv.ColumnDefinition
 import se.lu.nateko.cp.bintable.DataType
-import se.lu.nateko.cp.csv.RowSource
+import se.lu.nateko.cp.csv.CsvRowSource
+import se.lu.nateko.cp.rowsource.ColumnDefinition
+import se.lu.nateko.cp.rowsource.RowSource
 import scala.collection.JavaConverters._
 
 class CsvRowSourceTest extends FunSpec{

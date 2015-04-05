@@ -179,7 +179,7 @@ class NetCdfWriterTest extends FunSuite {
 		writer2.close()
 	}
 	
-	test("Multithredding"){
+	ignore("Multithredding"){
 		
 		val varName = "var2"
 		val slice = "1000000:1500000"

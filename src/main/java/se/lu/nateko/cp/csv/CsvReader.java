@@ -6,6 +6,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 
+import se.lu.nateko.cp.rowsource.ColumnDefinition;
+import se.lu.nateko.cp.rowsource.RowSource;
+import se.lu.nateko.cp.rowsource.TableReader;
+
 public class CsvReader implements TableReader{
 
 	private final File file;
