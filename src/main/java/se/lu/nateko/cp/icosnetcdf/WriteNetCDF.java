@@ -106,7 +106,7 @@ public class WriteNetCDF implements NetCdfWriter{
 	}
 
 	@Override
-	public void writeRow(Object[] row) throws IndexOutOfBoundsException {
+	public void writeRow(Object[] row) throws IndexOutOfBoundsException, IOException, InvalidRangeException {
 		int size = schema.variables.size(); 
 		if(size != row.length){
 			throw new IndexOutOfBoundsException("Wrong number of elements in a row!");
@@ -125,11 +125,9 @@ public class WriteNetCDF implements NetCdfWriter{
 				    try {
 						writer.write(var, new int[]{rowCounter}, floatA);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						throw new IOException("Could not write " + floatA.toString() + " in position " + rowCounter);
 					} catch (InvalidRangeException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						throw new InvalidRangeException("Could not write " + floatA.toString() + " in position " + rowCounter);
 					}
 				    break;
 				
@@ -139,11 +137,9 @@ public class WriteNetCDF implements NetCdfWriter{
 				    try {
 						writer.write(var, new int[]{rowCounter}, doubleA);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						throw new IOException("Could not write " + doubleA.toString() + " in position " + rowCounter);
 					} catch (InvalidRangeException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						throw new InvalidRangeException("Could not write " + doubleA.toString() + " in position " + rowCounter);
 					}
 				    break;
 				    
@@ -153,11 +149,9 @@ public class WriteNetCDF implements NetCdfWriter{
 				    try {
 						writer.write(var, new int[]{rowCounter}, intA);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						throw new IOException("Could not write " + intA.toString() + " in position " + rowCounter);
 					} catch (InvalidRangeException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						throw new InvalidRangeException("Could not write " + intA.toString() + " in position " + rowCounter);
 					}
 				    break;
 				    
@@ -168,11 +162,9 @@ public class WriteNetCDF implements NetCdfWriter{
 				    try {
 						writer.write(var, new int[]{rowCounter}, longA);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						throw new IOException("Could not write " + longA.toString() + " in position " + rowCounter);
 					} catch (InvalidRangeException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						throw new InvalidRangeException("Could not write " + longA.toString() + " in position " + rowCounter);
 					}
 				    break;
 				
@@ -185,27 +177,24 @@ public class WriteNetCDF implements NetCdfWriter{
 	}
 	
 	@Override
-	public void writeArray(Array arr, int variableIndex){
+	public void writeArray(Array arr, int variableIndex) throws IOException, InvalidRangeException{
 		Variable var = writer.findVariable(schema.variables.get(variableIndex).name);
 		
 		try {
 			writer.write(var, arr);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IOException(e.getMessage());
 		} catch (InvalidRangeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new InvalidRangeException(e.getMessage());
 		}
 	}
 
 	@Override
-	public void close() {
+	public void close() throws IOException {
 		try {
 			writer.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IOException(e.getMessage());
 		}
 	}
 

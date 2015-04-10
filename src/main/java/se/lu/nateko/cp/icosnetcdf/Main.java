@@ -19,6 +19,7 @@ import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.Period;
 
+import se.lu.nateko.cp.csv.CsvReader;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayDouble;
 import ucar.ma2.ArrayFloat;
@@ -42,14 +43,6 @@ import ucar.ma2.MAMath;
 public class Main {
 	
 	public static void main(String[] args) throws InvalidRangeException, IOException{
-		
-		
-		try {
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 		//String filename = "/home/roger/ICOS/L3_from_LSCE/CO2_EUROPE_LSCE.nc";
 		//String filename = "/disk/ICOS/NetCDF_test/create/largeTestDataLIMITED.nc4";
@@ -120,7 +113,6 @@ public class Main {
 		} catch (InvalidRangeException e){
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -248,7 +240,6 @@ public class Main {
 				try {
 					writer.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -390,7 +381,6 @@ public class Main {
 		    writer.close();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidRangeException e) {
 			e.printStackTrace();
