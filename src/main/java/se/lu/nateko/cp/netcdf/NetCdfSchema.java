@@ -1,4 +1,4 @@
-package se.lu.nateko.cp.icosnetcdf;
+package se.lu.nateko.cp.netcdf;
 
 import java.util.Map;
 import java.util.List;

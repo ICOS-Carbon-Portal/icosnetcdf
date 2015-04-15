@@ -1,4 +1,4 @@
-package se.lu.nateko.cp.icosnetcdf;
+package se.lu.nateko.cp.netcdf;
 
 import java.io.File;
 import java.io.IOException;

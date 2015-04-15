@@ -1,8 +1,8 @@
-package se.lu.nateko.cp.icosnetcdf.test
+package se.lu.nateko.cp.netcdf.test
 
 import org.scalatest.FunSuite
 import java.io.File
-import se.lu.nateko.cp.icosnetcdf._
+import se.lu.nateko.cp.netcdf._
 import ucar.ma2.DataType
 import ucar.nc2.NetcdfFileWriter
 import java.util.ArrayList
@@ -10,7 +10,7 @@ import ucar.nc2.NetcdfFile
 import java.util.Calendar
 import java.util.Hashtable
 import scala.collection.JavaConverters._
-import se.lu.nateko.cp.icosnetcdf.WriteNetCDF.ncVersion
+import se.lu.nateko.cp.netcdf.WriteNetCDF.ncVersion
 import se.lu.nateko.cp.test.TestUtils._
 import scala.concurrent.Future
 import scala.concurrent.Await

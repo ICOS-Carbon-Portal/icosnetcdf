@@ -4,7 +4,7 @@ import org.scalatest.FunSuite
 import se.lu.nateko.cp.bintable._
 import java.io.File
 import se.lu.nateko.cp.test.TestUtils
-import se.lu.nateko.cp.icosnetcdf.PlainColumn
+import se.lu.nateko.cp.netcdf.PlainColumn
 import scala.util.Success
 
 class BinTableTest extends FunSuite{

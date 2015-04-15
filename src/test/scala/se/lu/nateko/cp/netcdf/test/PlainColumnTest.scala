@@ -1,9 +1,9 @@
-package se.lu.nateko.cp.icosnetcdf.test
+package se.lu.nateko.cp.netcdf.test
 
 import org.scalatest.FunSuite
 import ucar.nc2.NetcdfFile
-import se.lu.nateko.cp.icosnetcdf.PlainColumn
-import se.lu.nateko.cp.icosnetcdf.FloatColumn
+import se.lu.nateko.cp.netcdf.PlainColumn
+import se.lu.nateko.cp.netcdf.FloatColumn
 import java.util.ArrayList
 
 class PlainColumnTest extends FunSuite {

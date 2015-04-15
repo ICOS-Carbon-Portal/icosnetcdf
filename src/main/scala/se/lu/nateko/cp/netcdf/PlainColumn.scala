@@ -1,4 +1,4 @@
-package se.lu.nateko.cp.icosnetcdf
+package se.lu.nateko.cp.netcdf
 
 import ucar.nc2.Variable
 import ucar.ma2.{Array => CdmArray, DataType}
