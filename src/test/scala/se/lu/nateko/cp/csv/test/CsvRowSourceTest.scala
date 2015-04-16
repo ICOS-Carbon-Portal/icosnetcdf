@@ -92,6 +92,7 @@ class CsvRowSourceTest extends FunSpec{
 		}
 	}
 	
+  val printExceptionMsg: Boolean = false
 	
 	describe("Parse error handling"){
 		val header = "header"
@@ -107,7 +108,7 @@ class CsvRowSourceTest extends FunSpec{
 				makeRows(content, colDefs)				
 			}
 			
-			println(myThrowable.getMessage)
+			if (printExceptionMsg) println(myThrowable.getMessage)
 			assert(myThrowable.getMessage.startsWith("Could not parse"))
 		}
 		
@@ -122,7 +123,7 @@ class CsvRowSourceTest extends FunSpec{
 				makeRows(content, colDefs)				
 			}
 			
-			println(myThrowable.getMessage)
+			if (printExceptionMsg) println(myThrowable.getMessage)
 			assert(myThrowable.getMessage.endsWith("is outside the range for Float."))
 		}
 		
@@ -137,7 +138,7 @@ class CsvRowSourceTest extends FunSpec{
 				makeRows(content, colDefs)				
 			}
 			
-			println(myThrowable.getMessage)
+			if (printExceptionMsg) println(myThrowable.getMessage)
 			assert(myThrowable.getMessage.startsWith("Could not parse"))
 		}
 		
@@ -152,7 +153,7 @@ class CsvRowSourceTest extends FunSpec{
 				makeRows(content, colDefs)				
 			}
 			
-			println(myThrowable.getMessage)
+			if (printExceptionMsg) println(myThrowable.getMessage)
 			assert(myThrowable.getMessage.endsWith("is outside the range for Double."))
 		}
 		
@@ -167,7 +168,7 @@ class CsvRowSourceTest extends FunSpec{
 				makeRows(content, colDefs)				
 			}
 			
-			println(myThrowable.getMessage)
+			if (printExceptionMsg) println(myThrowable.getMessage)
 			assert(myThrowable.getMessage.startsWith("Could not parse"))
 		}
 		
@@ -182,7 +183,7 @@ class CsvRowSourceTest extends FunSpec{
 				makeRows(content, colDefs)				
 			}
 			
-			println(myThrowable.getMessage)
+			if (printExceptionMsg) println(myThrowable.getMessage)
 			assert(myThrowable.getMessage.startsWith("Could not parse"))
 		}
 		
@@ -197,7 +198,7 @@ class CsvRowSourceTest extends FunSpec{
 				makeRows(content, colDefs)				
 			}
 			
-			println(myThrowable.getMessage)
+			if (printExceptionMsg) println(myThrowable.getMessage)
 			assert(myThrowable.getMessage.startsWith("Could not parse"))
 		}
 		
@@ -212,7 +213,7 @@ class CsvRowSourceTest extends FunSpec{
 				makeRows(content, colDefs)				
 			}
 			
-			println(myThrowable.getMessage)
+			if (printExceptionMsg) println(myThrowable.getMessage)
 			assert(myThrowable.getMessage.startsWith("Could not parse"))
 		}
 		
@@ -227,7 +228,7 @@ class CsvRowSourceTest extends FunSpec{
 				makeRows(content, colDefs)				
 			}
 			
-			println(myThrowable.getMessage)
+			if (printExceptionMsg) println(myThrowable.getMessage)
 			assert(myThrowable.getMessage.endsWith("Only one character is allowed."))
 		}
 		
@@ -242,7 +243,7 @@ class CsvRowSourceTest extends FunSpec{
 				makeRows(content, colDefs)				
 			}
 			
-			println(myThrowable.getMessage)
+			if (printExceptionMsg) println(myThrowable.getMessage)
 			assert(myThrowable.getMessage.startsWith("Column not present in input header"))
 		}
 		
@@ -257,7 +258,7 @@ class CsvRowSourceTest extends FunSpec{
 				makeRows(content, colDefs)				
 			}
 			
-			println(myThrowable.getMessage)
+			if (printExceptionMsg) println(myThrowable.getMessage)
 			assert(myThrowable.getMessage.startsWith("Could not parse"))
 		}
 		
@@ -272,7 +273,7 @@ class CsvRowSourceTest extends FunSpec{
 				makeRows(content, colDefs)				
 			}
 			
-			println(myThrowable.getMessage)
+			if (printExceptionMsg) println(myThrowable.getMessage)
 			assert(myThrowable.getMessage.startsWith("Bad decimal character in"))
 		}
 		
@@ -288,7 +289,7 @@ class CsvRowSourceTest extends FunSpec{
 				makeRows(content, colDefs)				
 			}
 			
-			println(myThrowable.getMessage)
+			if (printExceptionMsg) println(myThrowable.getMessage)
 			assert(myThrowable.getMessage.startsWith("This rows length (#"))
 		}
 	}
