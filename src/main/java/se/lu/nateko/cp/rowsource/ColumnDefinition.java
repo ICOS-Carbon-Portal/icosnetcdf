@@ -1,6 +1,6 @@
 package se.lu.nateko.cp.rowsource;
 
-import se.lu.nateko.cp.bintable.DataType;
+import se.lu.nateko.cp.rowsource.DataType;
 
 public class ColumnDefinition {
 	

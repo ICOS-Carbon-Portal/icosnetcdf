@@ -2,7 +2,7 @@ package se.lu.nateko.cp.rowsource.test
 
 import org.scalatest.FunSpec
 import se.lu.nateko.cp.rowsource.ColumnDefinition
-import se.lu.nateko.cp.bintable.DataType
+import se.lu.nateko.cp.rowsource.DataType
 import se.lu.nateko.cp.rowsource.ArrayRowSource
 import scala.collection.JavaConversions._
 

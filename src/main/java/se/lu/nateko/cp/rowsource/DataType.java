@@ -1,4 +1,4 @@
-package se.lu.nateko.cp.bintable;
+package se.lu.nateko.cp.rowsource;
 
 public enum DataType {
 	INT,

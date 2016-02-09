@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 
-import se.lu.nateko.cp.bintable.DataType;
+import se.lu.nateko.cp.rowsource.DataType;
 import se.lu.nateko.cp.csv.exceptions.BadNumber;
 import se.lu.nateko.cp.csv.exceptions.CsvException;
 import se.lu.nateko.cp.rowsource.ColumnDefinition;
